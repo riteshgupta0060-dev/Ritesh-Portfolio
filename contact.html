@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get In Touch | Ritesh Gupta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #ff5e00;
+            --blue: #3b82f6;
+            --text-light: rgba(255, 255, 255, 0.7);
+            --border: rgba(255, 255, 255, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Dark relevant shade background instead of pure black */
+        body {
+            background: linear-gradient(135deg, #16161d 0%, #0a0a0c 100%);
+            background-attachment: fixed;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            overflow-x: hidden;
+            padding-bottom: 5vh; 
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+        }
+        
+        .btn-primary, input, select, .submit-btn { text-shadow: none; }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        /* --- Reusable Components --- */
+        .tag-pill { display: inline-flex; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 50px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 24px; font-weight: 600; }
+        .dot-blue { width: 8px; height: 8px; background-color: var(--blue); border-radius: 50%; }
+
+        /* --- Navbar --- */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 30px 0; }
+        .logo { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
+        .logo a { color: #fff; text-decoration: none; }
+        .nav-links { display: flex; gap: 40px; font-size: 0.95rem; font-weight: 500; }
+        .nav-links a { color: #fff; text-decoration: none; transition: color 0.3s; }
+        .nav-links a:hover { color: var(--orange); }
+        .btn-primary { background: #fff; color: #000; padding: 8px 12px 8px 24px; border-radius: 50px; font-weight: 600; font-size: 0.9rem; text-decoration: none; display: inline-flex; align-items: center; gap: 12px; transition: transform 0.3s ease; }
+        .btn-primary:hover { transform: scale(1.05); }
+        .btn-icon { background: var(--orange); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; line-height: 1; }
+
+        /* --- Section 1: Hero --- */
+        .page-hero { padding: 120px 0 80px 0; text-align: center; margin-bottom: 20px; }
+        .page-title { font-size: clamp(3.5rem, 6vw, 5.5rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 24px; }
+        .page-subtext { font-size: 1.2rem; color: var(--text-light); max-width: 650px; margin: 0 auto; line-height: 1.6; }
+
+        /* --- Contact Form Section --- */
+        .contact-section { padding: 50px 0 50px 0; position: relative; }
+        .badge { position: absolute; top: 20px; right: 0; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); padding: 15px 20px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); max-width: 250px; }
+        .badge strong { font-size: 0.8rem; letter-spacing: 1px; color: var(--text-light); }
+        .badge p { font-size: 0.9rem; margin-top: 5px; line-height: 1.4; }
+        
+        .huge-text { font-size: clamp(4rem, 10vw, 9rem); font-weight: 800; line-height: 0.9; letter-spacing: -0.04em; }
+        .huge-text-row { display: flex; align-items: flex-end; gap: 40px; margin-bottom: 80px; }
+        .huge-subtext { padding-bottom: 20px; }
+        .huge-subtext p { color: var(--text-light); font-size: 1rem; line-height: 1.5; font-weight: 500; }
+
+        .contact-form { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); padding: 50px; border-radius: 24px; margin-bottom: 50px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
+        .form-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.2); padding: 15px 0; color: #fff; font-size: 0.9rem; font-family: 'Inter', sans-serif; transition: border-color 0.3s; }
+        .form-input:focus { outline: none; border-color: var(--orange); }
+        .form-input::placeholder { color: rgba(255,255,255,0.3); }
+        .form-input option { background: #16161d; color: #fff; }
+        .submit-btn { background: var(--orange); color: #fff; border: none; padding: 15px 40px; border-radius: 50px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.3s; letter-spacing: 1px; }
+        .submit-btn:hover { background: #fff; color: #000; }
+
+        /* --- Footer (Matches Index/Projects/About) --- */
+        .footer { display: flex; justify-content: space-between; align-items: center; padding: 50px 60px; background: linear-gradient(135deg, rgba(70, 70, 70, 0.5) 0%, rgba(10, 10, 10, 0.85) 100%); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; margin-top: 80px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .footer-links { display: flex; gap: 30px; flex-wrap: wrap; align-items: center; }
+        .footer-links a { color: var(--text-light); text-decoration: none; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; transition: color 0.3s; font-weight: 500; }
+        .footer-links a:hover { color: #fff; }
+        .footer-address { text-align: right; }
+        .footer-address p:first-child { font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; font-weight: 700; color: #fff; }
+        .footer-address p:last-child { color: var(--text-light); font-size: 0.9rem; line-height: 1.8; }
+        .footer-address a { color: var(--text-light); text-decoration: none; transition: 0.3s; }
+        .footer-address a:hover { color: var(--orange); }
+
+        /* --- Responsive --- */
+        @media (max-width: 992px) {
+            .huge-text-row { flex-direction: column; align-items: flex-start; gap: 0; }
+            .huge-subtext { padding-bottom: 0; }
+            .badge { position: relative; top: 0; right: 0; margin-bottom: 40px; max-width: 100%; }
+            .form-row { grid-template-columns: 1fr; }
+            .contact-form { padding: 30px; }
+            .footer { flex-direction: column; align-items: center; gap: 40px; text-align: center; padding: 40px 30px; }
+            .footer-links { justify-content: center; }
+            .footer-address { text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="content-wrapper">
+        
+        <!-- Navigation -->
+        <nav>
+            <div class="logo"><a href="index.html">RITESHOSOROUS</a></div>
+            <div class="nav-links">
+                <a href="index.html">HOME</a>
+                <a href="projects.html">WORK</a>
+                <a href="about.html">ABOUT</a>
+            </div>
+            <a href="contact.html" class="btn-primary">
+                GET IN TOUCH
+                <div class="btn-icon">→</div>
+            </a>
+        </nav>
+
+        <!-- Section 1: Hero & Subtext -->
+        <header class="page-hero">
+            <div class="tag-pill"><div class="dot-blue"></div> OPEN TO COLLABORATION</div>
+            <h1 class="page-title">Let's Talk</h1>
+            <p class="page-subtext">Ready to elevate your brand with stunning AI visuals? Let's discuss your next cinematic or commercial project.</p>
+        </header>
+
+        <!-- Contact Section -->
+        <section class="contact-section">
+            <div class="badge">
+                <strong>LET'S TALK</strong>
+                <p>Unique personalized AI content for your next campaign</p>
+            </div>
+            <h2 class="huge-text">READY TO</h2>
+            <div class="huge-text-row">
+                <h2 class="huge-text">CREATE</h2>
+                <div class="huge-subtext">
+                    <p>& PRODUCE CONTENT<br>THAT STANDS OUT.</p>
+                </div>
+            </div>
+
+            <div class="contact-form">
+                <div class="form-row">
+                    <input type="text" placeholder="NAME / BRAND NAME" class="form-input">
+                    <input type="email" placeholder="EMAIL ADDRESS" class="form-input">
+                </div>
+                <div class="form-row">
+                    <select class="form-input">
+                        <option value="" disabled selected>PROJECT TYPE</option>
+                        <option value="commercial">AI COMMERCIAL</option>
+                        <option value="ugc">UGC CONTENT</option>
+                        <option value="cinematic">CINEMATIC TEASER</option>
+                        <option value="editing">VIDEO EDITING</option>
+                    </select>
+                    <input type="text" placeholder="PROJECT BUDGET" class="form-input">
+                </div>
+                <input type="text" placeholder="TELL ME ABOUT YOUR PROJECT..." class="form-input" style="width: 100%; margin-bottom: 30px;">
+                <button class="submit-btn">SEND MESSAGE</button>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-links">
+                <a href="index.html">HOME</a>
+                <a href="projects.html">WORK</a>
+                <a href="about.html">ABOUT</a>
+                <a href="contact.html">GET IN TOUCH</a>
+            </div>
+            <div class="footer-address">
+                <p>MUMBAI, INDIA</p>
+                <p><a href="tel:+917376190518">+91 7376190518</a><br><a href="mailto:Riteshgupta0060@gmail.com">Riteshgupta0060@gmail.com</a></p>
+            </div>
+        </footer>
+
+    </div>
+
+</body>
+</html>

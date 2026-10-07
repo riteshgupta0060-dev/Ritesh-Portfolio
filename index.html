@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ritesh Gupta | AI Video Creator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #ff5e00;
+            --blue: #3b82f6;
+            --text-light: rgba(255, 255, 255, 0.7);
+            --border: rgba(255, 255, 255, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #000;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            overflow-x: hidden;
+            padding-bottom: 5vh; 
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+        }
+        input, select, .btn-primary { text-shadow: none; }
+        
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            filter: brightness(0.7); 
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        /* --- Reusable Components --- */
+        .tag-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 40px;
+            font-weight: 600;
+        }
+
+        .dot-blue {
+            width: 8px;
+            height: 8px;
+            background-color: var(--blue);
+            border-radius: 50%;
+        }
+
+        /* --- Navbar --- */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 30px 0; }
+        .logo { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
+        .nav-links { display: flex; gap: 40px; font-size: 0.95rem; font-weight: 500; }
+        .nav-links a { color: #fff; text-decoration: none; transition: color 0.3s; }
+        .nav-links a:hover { color: var(--orange); }
+        .btn-primary { background: #fff; color: #000; padding: 8px 12px 8px 24px; border-radius: 50px; font-weight: 600; font-size: 0.9rem; text-decoration: none; display: inline-flex; align-items: center; gap: 12px; transition: transform 0.3s ease; }
+        .btn-primary:hover { transform: scale(1.05); }
+        .btn-icon { background: var(--orange); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; line-height: 1; }
+
+        /* --- Hero Section --- */
+        .hero { padding: 120px 0 80px 0; min-height: 80vh; display: flex; flex-direction: column; justify-content: space-between; }
+        .hero-top { display: grid; grid-template-columns: 1.5fr 1fr; gap: 60px; align-items: center; }
+        .hero-intro { font-size: 1.2rem; font-weight: 500; margin-bottom: 20px; }
+        .hero-title { font-size: clamp(4rem, 8vw, 7.5rem); font-weight: 800; line-height: 1.05; letter-spacing: -0.03em; }
+        .hero-desc { max-width: 400px; padding-top: 40px; }
+        .hero-desc h3 { font-size: 2rem; font-weight: 600; line-height: 1.2; margin-bottom: 20px; }
+        .hero-desc p { color: var(--text-light); font-size: 1rem; line-height: 1.6; }
+        .hero-services { display: flex; justify-content: space-between; margin-top: 120px; border-top: 1px solid var(--border); padding-top: 40px; }
+        .service-item { flex: 1; }
+        .service-num { background: rgba(255, 94, 0, 0.15); color: #fff; border: 1px solid rgba(255, 94, 0, 0.4); padding: 4px 12px; border-radius: 50px; display: inline-block; font-size: 0.8rem; font-weight: 600; margin-bottom: 12px; text-shadow: none; }
+        .service-name { font-size: 1rem; font-weight: 500; }
+
+        /* --- Brands Strip --- */
+        .brands-strip { display: flex; align-items: center; justify-content: space-between; padding: 40px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 60px 0 120px 0; }
+        .brands-title { font-size: 0.9rem; color: var(--text-light); max-width: 150px; line-height: 1.4; }
+        .brand-logo { display: flex; align-items: center; gap: 12px; font-size: 1.2rem; font-weight: 600; }
+        .brand-logo-icon { width: 20px; height: 20px; border: 2px solid #fff; border-radius: 50%; }
+        .brand-logo:nth-child(3) .brand-logo-icon { border-radius: 0; }
+        .brand-logo:nth-child(4) .brand-logo-icon { border-radius: 50% 0 50% 50%; }
+
+        /* --- Showcase Section --- */
+        .showcase-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 100px; }
+        .showcase-card { border-radius: 20px; overflow: hidden; aspect-ratio: 3/4; position: relative; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+        .showcase-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
+        .showcase-card:hover img { transform: scale(1.08); }
+        .showcase-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); opacity: 0; transition: opacity 0.4s; display: flex; align-items: flex-end; padding: 30px; }
+        .showcase-card:hover .showcase-overlay { opacity: 1; }
+        .showcase-title { color: #fff; font-size: 1.2rem; font-weight: 600; text-shadow: none; transform: translateY(20px); transition: transform 0.4s; letter-spacing: 0.5px; }
+        .showcase-card:hover .showcase-title { transform: translateY(0); }
+
+        /* --- About Section --- */
+        .about-section { padding-bottom: 100px; border-bottom: 1px solid var(--border); margin-bottom: 100px; }
+        .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; margin-bottom: 100px; }
+        .about-label { background: rgba(255, 94, 0, 0.15); color: #fff; border: 1px solid rgba(255, 94, 0, 0.4); padding: 6px 16px; border-radius: 50px; display: inline-block; font-weight: 600; margin-bottom: 24px; font-size: 0.9rem; text-transform: uppercase; text-shadow: none; }
+        .about-title { font-size: clamp(3rem, 5vw, 4.5rem); font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; }
+        .about-right { padding-top: 20px; }
+        .about-desc { font-size: 1.3rem; font-weight: 500; line-height: 1.5; margin-bottom: 24px; color: #fff; }
+        .about-text { font-size: 1rem; color: var(--text-light); line-height: 1.6; margin-bottom: 20px; }
+        .about-text strong { color: #fff; font-weight: 600; }
+        .about-cta { display: flex; align-items: center; gap: 40px; }
+        .about-cta p { color: var(--text-light); font-size: 0.9rem; line-height: 1.5; max-width: 200px; }
+        
+        .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        .card { border-radius: 20px; overflow: hidden; aspect-ratio: 3/4; }
+        .card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .card:hover img { transform: scale(1.03); }
+
+        /* --- Workflow Section --- */
+        .workflow-section { padding: 100px 0; border-bottom: 1px solid var(--border); margin-bottom: 100px;}
+        .workflow-header { display: grid; grid-template-columns: 1.2fr 1fr; gap: 60px; margin-bottom: 80px; }
+        .workflow-title { font-size: clamp(2.5rem, 4vw, 3.5rem); font-weight: 500; line-height: 1.2; letter-spacing: -0.02em; }
+        .workflow-title em { font-style: italic; font-weight: 300; font-family: 'Times New Roman', serif; }
+        .workflow-desc { color: var(--text-light); font-size: 1rem; line-height: 1.6; padding-top: 10px; }
+        
+        .timeline-container { position: relative; margin: 80px 0; padding: 40px 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .timeline-bg-lines { position: absolute; top: 0; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-between; z-index: -1; }
+        .timeline-bg-lines .t-line { width: 1px; background-image: linear-gradient(to bottom, rgba(255,255,255,0.15) 50%, transparent 50%); background-size: 1px 16px; }
+        
+        .t-col { display: flex; flex-direction: column; align-items: flex-start; gap: 40px; }
+        .t-node {
+            display: inline-flex; align-items: center; gap: 12px;
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 50px;
+            padding: 8px 10px 8px 18px; font-size: 0.95rem; font-weight: 500;
+        }
+        .t-node .t-badge { background: #fff; color: #000; padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; margin-left: 5px;}
+        .workflow-footer { display: flex; align-items: flex-start; gap: 15px; max-width: 600px; margin-top: 60px;}
+        .workflow-footer p { font-size: 0.9rem; color: var(--text-light); line-height: 1.5; }
+
+        /* --- Tool Stack Section --- */
+        .color-palette-section { padding: 100px 0 150px 0; border-bottom: 1px solid var(--border); margin-bottom: 100px; }
+        .color-title { font-size: clamp(2.5rem, 4vw, 3.5rem); font-weight: 500; line-height: 1.2; letter-spacing: -0.02em; max-width: 800px; margin-bottom: 100px;}
+        
+        .palette-visualization { position: relative; min-height: 600px; display: flex; align-items: center; justify-content: center; }
+        .palette-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 350px; height: 350px; border: 2px dashed rgba(255,255,255,0.15); border-radius: 50%; z-index: 0; }
+        
+        .color-panel {
+            position: absolute; z-index: 2; width: 320px;
+            background: rgba(25, 25, 30, 0.4); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;
+            padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+        .color-panel:hover { transform: translateY(-5px) scale(1.02); }
+        
+        .panel-1 { top: 0; right: 5%; }
+        .panel-2 { bottom: 0; right: 10%; }
+        .panel-3 { bottom: -50px; left: 10%; }
+        .panel-4 { top: 15%; left: 0; }
+
+        .panel-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; font-weight: 600; margin-bottom: 15px; }
+        .panel-header span { opacity: 0.5; font-size: 1.1rem; cursor: pointer; }
+        .panel-desc { color: var(--text-light); font-size: 0.8rem; line-height: 1.5; margin-bottom: 20px; }
+        .panel-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); padding: 10px 0; font-size: 0.75rem; color: var(--text-light); font-family: monospace;}
+        .panel-row span:nth-child(2) { color: #fff; font-weight: 600; flex: 1; margin-left: 20px; }
+        .panel-row span:nth-child(3) { background: rgba(255, 94, 0, 0.15); color: #fff; border: 1px solid rgba(255, 94, 0, 0.4); padding: 2px 10px; border-radius: 50px; display: inline-block; text-shadow: none; font-size: 0.7rem; }
+
+        /* --- Contact Form Section --- */
+        .contact-section { padding: 50px 0 50px 0; position: relative; }
+        .contact-header { position: relative; margin-bottom: 100px; }
+        .badge { position: absolute; top: 10px; right: 15%; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); padding: 15px 20px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); max-width: 220px; }
+        .badge strong { font-size: 0.8rem; display: block; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .badge p { font-size: 0.75rem; color: var(--text-light); line-height: 1.4; }
+        .huge-text { font-size: clamp(4rem, 12vw, 11.5rem); font-weight: 300; line-height: 0.9; letter-spacing: -0.04em; text-transform: uppercase; }
+        .huge-text-row { display: flex; align-items: flex-end; gap: 30px; flex-wrap: wrap; }
+        .huge-subtext { display: flex; flex-direction: column; font-size: clamp(2rem, 5vw, 4.5rem); font-weight: 300; line-height: 0.95; letter-spacing: -0.02em; text-transform: uppercase; padding-bottom: 8px; }
+        
+        .contact-form { display: grid; grid-template-columns: 1fr 1fr; gap: 60px 80px; margin-bottom: 100px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 15px; }
+        .form-group input, .form-group select { background: transparent; border: none; border-bottom: 1px solid rgba(255, 255, 255, 0.3); color: #fff; padding: 10px 0; font-size: 1rem; font-family: inherit; outline: none; border-radius: 0; appearance: none; transition: border-color 0.3s; }
+        .form-group input:focus, .form-group select:focus { border-bottom-color: #fff; }
+        .form-group select { cursor: pointer; background-image: url('data:image/svg+xml;utf8,<svg fill="white" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); background-repeat: no-repeat; background-position-x: 100%; background-position-y: center; }
+        .form-group input::placeholder { color: var(--text-light); }
+        .form-submit { grid-column: 1 / -1; display: flex; justify-content: flex-end; margin-top: -20px; }
+        .submit-btn { background: transparent; color: #fff; border: 1px solid rgba(255, 255, 255, 0.4); padding: 15px 70px; border-radius: 50px; font-size: 0.9rem; letter-spacing: 1px; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; }
+        .submit-btn:hover { background: #fff; color: #000; }
+
+        /* --- Footer --- */
+        .footer { display: flex; justify-content: space-between; align-items: center; padding: 50px 60px; background: linear-gradient(135deg, rgba(70, 70, 70, 0.5) 0%, rgba(10, 10, 10, 0.85) 100%); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; margin-top: 80px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .footer-links { display: flex; gap: 30px; flex-wrap: wrap; align-items: center; }
+        .footer-links a { color: var(--text-light); text-decoration: none; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; transition: color 0.3s; font-weight: 500; }
+        .footer-links a:hover { color: #fff; }
+        .footer-address { text-align: right; }
+        .footer-address p:first-child { font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; font-weight: 700; color: #fff; }
+        .footer-address p:last-child { color: var(--text-light); font-size: 0.9rem; line-height: 1.8; }
+        .footer-address a { color: var(--text-light); text-decoration: none; transition: 0.3s; }
+        .footer-address a:hover { color: var(--orange); }
+
+        /* --- Responsive Adjustments --- */
+        @media (max-width: 992px) {
+            .hero-top, .about-grid, .workflow-header { grid-template-columns: 1fr; gap: 40px; }
+            .hero-services, .brands-strip { flex-wrap: wrap; gap: 30px; }
+            .service-item { flex: 1 1 40%; }
+            .cards-grid, .contact-form { grid-template-columns: 1fr; gap: 40px; }
+            .timeline-container { grid-template-columns: 1fr; padding-left: 20px; }
+            .timeline-bg-lines { display: none; }
+            .t-col { gap: 20px; padding-top: 0 !important; }
+            .palette-visualization { display: flex; flex-direction: column; gap: 20px; min-height: auto; }
+            .palette-ring { display: none; }
+            .color-panel { position: static; width: 100%; transform: none !important; }
+            .huge-text-row { flex-direction: column; align-items: flex-start; gap: 0; }
+            .huge-subtext { padding-bottom: 0; }
+            .footer { flex-direction: column; align-items: center; gap: 40px; text-align: center; padding: 40px 30px; }
+            .footer-links { justify-content: center; }
+            .footer-address { text-align: center; }
+            .badge { position: relative; top: 0; right: 0; margin-bottom: 40px; max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="animation-canvas"></canvas>
+
+    <div class="content-wrapper">
+        
+        <!-- Navigation -->
+        <nav>
+            <div class="logo"><a href="index.html" style="color: inherit; text-decoration: none;">RITESHOSOROUS</a></div>
+            <div class="nav-links">
+                <a href="index.html">HOME</a>
+                <a href="projects.html">WORK</a>
+                <a href="about.html">ABOUT</a>
+            </div>
+            <a href="contact.html" class="btn-primary">
+                GET IN TOUCH
+                <div class="btn-icon">→</div>
+            </a>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-top">
+                <div>
+                    <div class="hero-intro">Hey, I'm Ritesh Gupta</div>
+                    <h1 class="hero-title">AI Video<br>Creator</h1>
+                </div>
+                <div class="hero-desc">
+                    <h3>Cinematic visuals crafted with AI.</h3>
+                    <p>I specialize in AI-generated advertisements, UGC-style videos, and professional post-production workflows for brands.</p>
+                </div>
+            </div>
+            <div class="hero-services">
+                <div class="service-item"><div class="service-num">#01</div><div class="service-name">AI Video Generation</div></div>
+                <div class="service-item"><div class="service-num">#02</div><div class="service-name">Video Editing</div></div>
+                <div class="service-item"><div class="service-num">#03</div><div class="service-name">Visual Experimentation</div></div>
+                <div class="service-item"><div class="service-num">#04</div><div class="service-name">Visual Storytelling</div></div>
+            </div>
+        </section>
+
+        <!-- Brands Marquee -->
+        <section class="brands-strip">
+            <div class="brands-title">Selected Projects & Collaborations</div>
+            <div class="brand-logo"><div class="brand-logo-icon" style="border-radius: 50%;"></div> Taarget Papers LLP</div>
+            <div class="brand-logo"><div class="brand-logo-icon" style="border-radius: 0; transform: rotate(45deg);"></div> Enkey Enterprises</div>
+            <div class="brand-logo"><div class="brand-logo-icon" style="border-radius: 50% 50% 0 0;"></div> LULICA CREAM</div>
+            <div class="brand-logo"><div class="brand-logo-icon" style="border-radius: 50% 0 50% 50%;"></div> OM TURANTH COURIER</div>
+        </section>
+
+        <!-- Showcase Section -->
+        <section class="showcase-section">
+            <div class="showcase-grid">
+                <div class="showcase-card">
+                    <img src="./assets/new-showcase-1.jpg" alt="Video Editing Timeline">
+                    <div class="showcase-overlay"><div class="showcase-title">Professional Editing</div></div>
+                </div>
+                <div class="showcase-card">
+                    <img src="./assets/new-showcase-2.jpg" alt="Pencil Sketch Portrait">
+                    <div class="showcase-overlay"><div class="showcase-title">Sketching</div></div>
+                </div>
+                <div class="showcase-card">
+                    <img src="./assets/new-showcase-3.jpg" alt="AI Generation Interface">
+                    <div class="showcase-overlay"><div class="showcase-title">AI Video Generation</div></div>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- Workflow Section -->
+        <section class="workflow-section">
+            <div class="tag-pill"><div class="dot-blue"></div> AI WORKFLOW</div>
+            
+            <div class="workflow-header">
+                <h2 class="workflow-title">A structured pipeline from <em>prompt generation</em> to final cinematic cut.</h2>
+                <p class="workflow-desc">My process combines AI-assisted exploration with hands-on post-production. From developing detailed prompts and generating assets to professional editing, color grading, and final delivery.</p>
+            </div>
+
+            <div class="timeline-container">
+                <div class="timeline-bg-lines">
+                    <div class="t-line"></div><div class="t-line"></div><div class="t-line"></div><div class="t-line"></div>
+                </div>
+                <div class="t-col">
+                    <div class="t-node">⚲ Ideation & Prompting <span class="t-badge">Step 1</span></div>
+                    <div class="t-node" style="margin-top: 20px;">⌖ Asset Generation <span class="t-badge">Step 2</span></div>
+                </div>
+                <div class="t-col" style="padding-top: 100px;">
+                    <div class="t-node">❏ Voiceover & Audio <span class="t-badge">Step 3</span></div>
+                </div>
+                <div class="t-col" style="padding-top: 150px;">
+                    <div class="t-node">✧ Professional Editing <span class="t-badge">Step 4</span></div>
+                    <div class="t-node" style="margin-top: 20px;">✦ VFX & Refinement <span class="t-badge">Step 5</span></div>
+                </div>
+                <div class="t-col" style="padding-top: 250px;">
+                    <div class="t-node">❖ Final Delivery <span class="t-badge">Ready</span></div>
+                </div>
+            </div>
+
+            <div class="workflow-footer">
+                <div class="dot-blue" style="margin-top: 6px;"></div>
+                <p>A structured workflow helps turn concepts into polished AI-generated commercials with a clear narrative, premium visual language, and detailed post-production.</p>
+            </div>
+        </section>
+
+        <!-- Tool Stack Section -->
+        <section class="color-palette-section">
+            <div class="tag-pill"><div class="dot-blue"></div> TOOL STACK</div>
+            
+            <h2 class="color-title">A versatile toolkit combining cutting-edge AI with industry-standard editing software.</h2>
+            
+            <div class="palette-visualization">
+                <div class="palette-ring"></div>
+                
+                <!-- Panel 1: AI Generation -->
+                <div class="color-panel panel-1">
+                    <div class="panel-header">AI Video Gen <span>✕</span></div>
+                    <p class="panel-desc">Used for prompt engineering, ideation, and highly realistic text-to-video asset creation.</p>
+                    <div class="panel-row"><span>SOFTWARE</span><span>Google Flow & Gemini</span><span>AI</span></div>
+                    <div class="panel-row"><span>USE CASE</span><span>Asset Generation</span><span>Vid</span></div>
+                </div>
+
+                <!-- Panel 2: Audio -->
+                <div class="color-panel panel-2">
+                    <div class="panel-header">Voice & Audio <span>✕</span></div>
+                    <p class="panel-desc">Used for generating lifelike voiceovers for UGC-style and cinematic branded content.</p>
+                    <div class="panel-row"><span>SOFTWARE</span><span>ElevenLabs</span><span>AI</span></div>
+                    <div class="panel-row"><span>USE CASE</span><span>Voiceovers</span><span>Aud</span></div>
+                </div>
+
+                <!-- Panel 3: Editing -->
+                <div class="color-panel panel-3">
+                    <div class="panel-header">Video Editing <span>✕</span></div>
+                    <p class="panel-desc">Used for professional post-production workflows, timeline assembly, and color grading.</p>
+                    <div class="panel-row"><span>SOFTWARE</span><span>Premiere Pro</span><span>PRO</span></div>
+                    <div class="panel-row"><span>USE CASE</span><span>Post-Production</span><span>Cut</span></div>
+                </div>
+
+                <!-- Panel 4: VFX -->
+                <div class="color-panel panel-4">
+                    <div class="panel-header">3D & VFX <span>✕</span></div>
+                    <p class="panel-desc">Used for visual storytelling, 3D modeling, and advanced motion graphics refinement.</p>
+                    <div class="panel-row"><span>SOFTWARE</span><span>Blender</span><span>PRO</span></div>
+                    <div class="panel-row"><span>USE CASE</span><span>Visual Effects</span><span>Anim</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-links">
+                <a href="index.html">HOME</a>
+                <a href="projects.html">WORK</a>
+                <a href="about.html">ABOUT</a>
+                <a href="contact.html">GET IN TOUCH</a>
+            </div>
+            <div class="footer-address">
+                <p>MUMBAI, INDIA</p>
+                <p><a href="tel:+917376190518">+91 7376190518</a><br><a href="mailto:Riteshgupta0060@gmail.com">Riteshgupta0060@gmail.com</a></p>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        const canvas = document.getElementById("animation-canvas");
+        const context = canvas.getContext("2d");
+        const frameCount = 180;
+        const getFramePath = index => (`./frames/ezgif-frame-${index.toString().padStart(3, '0')}.jpg`);
+
+        const images = [];
+        let loadedImages = 0;
+        
+        for (let i = 1; i <= frameCount; i++) {
+            const img = new Image();
+            img.src = getFramePath(i);
+            images.push(img);
+            img.onload = () => {
+                loadedImages++;
+                if (i === 1) renderImage(img);
+            };
+        }
+
+        function resizeCanvas() {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = window.innerWidth * dpr;
+            canvas.height = window.innerHeight * dpr;
+            context.scale(dpr, dpr);
+            if (images[0] && loadedImages > 0) renderImage(images[Math.floor(currentFrameIndex)]);
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+
+        function renderImage(img) {
+            if (!img || !img.complete) return;
+            const canvasWidth = window.innerWidth;
+            const canvasHeight = window.innerHeight;
+            const canvasRatio = canvasWidth / canvasHeight;
+            const imgRatio = img.width / img.height;
+            let drawWidth = canvasWidth, drawHeight = canvasHeight, offsetX = 0, offsetY = 0;
+
+            if (canvasRatio > imgRatio) {
+                drawHeight = canvasWidth / imgRatio;
+                offsetY = (canvasHeight - drawHeight) / 2;
+            } else {
+                drawWidth = canvasHeight * imgRatio;
+                offsetX = (canvasWidth - drawWidth) / 2;
+            }
+            context.clearRect(0, 0, canvasWidth, canvasHeight);
+            context.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+        }
+
+        resizeCanvas();
+
+        let currentScroll = 0, targetScroll = 0, currentFrameIndex = 0;
+        const ease = 0.07; 
+
+        window.addEventListener('scroll', () => { targetScroll = window.scrollY; });
+
+        function renderLoop() {
+            currentScroll += (targetScroll - currentScroll) * ease;
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            if (maxScroll > 0) {
+                const scrollFraction = currentScroll / maxScroll;
+                const rawFrameIndex = scrollFraction * (frameCount - 1);
+                currentFrameIndex = Math.min(frameCount - 1, Math.max(0, Math.floor(rawFrameIndex)));
+                if (images[currentFrameIndex]) renderImage(images[currentFrameIndex]);
+            }
+            requestAnimationFrame(renderLoop);
+        }
+        
+        requestAnimationFrame(renderLoop);
+    </script>
+</body>
+</html>

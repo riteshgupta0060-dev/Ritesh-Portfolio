@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | Ritesh Gupta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange: #ff5e00;
+            --blue: #3b82f6;
+            --text-light: rgba(255, 255, 255, 0.7);
+            --border: rgba(255, 255, 255, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Dark relevant shade background instead of pure black */
+        body {
+            background: linear-gradient(135deg, #16161d 0%, #0a0a0c 100%);
+            background-attachment: fixed;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            overflow-x: hidden;
+            padding-bottom: 5vh; 
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+        }
+        
+        .btn-primary, .btn-outline { text-shadow: none; }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        /* --- Reusable Components --- */
+        .tag-pill { display: inline-flex; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 50px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 24px; font-weight: 600; }
+        .dot-blue { width: 8px; height: 8px; background-color: var(--blue); border-radius: 50%; }
+
+        /* --- Navbar --- */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 30px 0; }
+        .logo { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
+        .logo a { color: #fff; text-decoration: none; }
+        .nav-links { display: flex; gap: 40px; font-size: 0.95rem; font-weight: 500; }
+        .nav-links a { color: #fff; text-decoration: none; transition: color 0.3s; }
+        .nav-links a:hover { color: var(--orange); }
+        .nav-links a.active { background: rgba(255, 94, 0, 0.15); color: #fff; border: 1px solid rgba(255, 94, 0, 0.4); padding: 6px 16px; border-radius: 50px; text-shadow: none; }
+        .btn-primary { background: #fff; color: #000; padding: 8px 12px 8px 24px; border-radius: 50px; font-weight: 600; font-size: 0.9rem; text-decoration: none; display: inline-flex; align-items: center; gap: 12px; transition: transform 0.3s ease; }
+        .btn-primary:hover { transform: scale(1.05); }
+        .btn-icon { background: var(--orange); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; line-height: 1; }
+
+        /* --- Section 1: Hero --- */
+        .page-hero { padding: 120px 0 80px 0; text-align: center; border-bottom: 1px solid var(--border); margin-bottom: 100px; }
+        .page-title { font-size: clamp(3.5rem, 6vw, 5.5rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 24px; }
+        .page-subtext { font-size: 1.2rem; color: var(--text-light); max-width: 650px; margin: 0 auto; line-height: 1.6; }
+
+        /* --- About Grid Section --- */
+        .about-section { padding-bottom: 100px; margin-bottom: 100px; }
+        .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; }
+        .about-title { font-size: clamp(3rem, 4.5vw, 4.5rem); font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; position: sticky; top: 120px; }
+        .about-right { padding-top: 20px; }
+        .about-desc { font-size: 1.3rem; font-weight: 500; line-height: 1.5; margin-bottom: 30px; color: #fff; }
+        .about-text { font-size: 1.05rem; color: var(--text-light); line-height: 1.7; margin-bottom: 24px; }
+        .about-text strong { color: #fff; font-weight: 600; }
+
+        /* --- Footer (Matches Index/Projects) --- */
+        .footer { display: flex; justify-content: space-between; align-items: center; padding: 50px 60px; background: linear-gradient(135deg, rgba(70, 70, 70, 0.5) 0%, rgba(10, 10, 10, 0.85) 100%); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; margin-top: 80px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .footer-links { display: flex; gap: 30px; flex-wrap: wrap; align-items: center; }
+        .footer-links a { color: var(--text-light); text-decoration: none; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; transition: color 0.3s; font-weight: 500; }
+        .footer-links a:hover { color: #fff; }
+        .footer-address { text-align: right; }
+        .footer-address p:first-child { font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; font-weight: 700; color: #fff; }
+        .footer-address p:last-child { color: var(--text-light); font-size: 0.9rem; line-height: 1.8; }
+        .footer-address a { color: var(--text-light); text-decoration: none; transition: 0.3s; }
+        .footer-address a:hover { color: var(--orange); }
+
+        /* --- Responsive --- */
+        @media (max-width: 992px) {
+            .about-grid { grid-template-columns: 1fr; gap: 50px; }
+            .about-title { position: static; }
+            .footer { flex-direction: column; align-items: center; gap: 40px; text-align: center; padding: 40px 30px; }
+            .footer-links { justify-content: center; }
+            .footer-address { text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="content-wrapper">
+        
+        <!-- Navigation -->
+        <nav>
+            <div class="logo"><a href="index.html">RITESHOSOROUS</a></div>
+            <div class="nav-links">
+                <a href="index.html">HOME</a>
+                <a href="projects.html">WORK</a>
+                <a href="about.html" class="active">ABOUT</a>
+            </div>
+            <a href="contact.html" class="btn-primary">
+                GET IN TOUCH
+                <div class="btn-icon">→</div>
+            </a>
+        </nav>
+
+        <!-- Section 1: Hero & Subtext -->
+        <header class="page-hero">
+            <div class="tag-pill"><div class="dot-blue"></div> BEHIND THE VISUALS</div>
+            <h1 class="page-title">About Me</h1>
+            <p class="page-subtext">Discover the multidisciplinary journey, skills, and creative vision behind my visual storytelling.</p>
+        </header>
+
+        <!-- About Content Section -->
+        <section class="about-section">
+            <div class="about-grid">
+                <div>
+                    <!-- Extracted the impactful last line to use as the sticky bold header -->
+                    <h2 class="about-title">Turning ideas<br>into visuals<br>and visuals into<br>experiences.</h2>
+                </div>
+                <div class="about-right">
+                    <p class="about-desc">I’m a multidisciplinary visual creative with a passion for turning ideas into compelling visuals.</p>
+
+                    <p class="about-text">My creative journey spans across <strong>sketching, photography, videography, video editing, visual storytelling, and AI-powered content creation</strong>. Over the past <strong>nearly two years of freelance experience</strong>, I’ve had the opportunity to work on a variety of creative projects, including <strong>commercials, social media content, branded videos, and AI-generated advertisements for clients</strong>.</p>
+                    
+                    <p class="about-text">I enjoy working across the entire creative process from developing an idea and creating initial sketches and visual concepts, to capturing footage, designing shots, editing, and bringing the final piece to life. I’m particularly interested in exploring how <strong>traditional creative skills and emerging AI technologies</strong> can come together to create fresh and engaging visual experiences.</p>
+
+                    <p class="about-text">Alongside my freelance work, I’m currently pursuing a <strong>B.Sc. in Animation & VFX</strong>, where I continue to develop my understanding of animation, visual effects, filmmaking, design, and digital production.</p>
+                    
+                    <p class="about-text">For me, creativity isn't limited to one medium. Whether it's a pencil sketch, a photograph, a camera, an edit, or an AI-generated visual, I’m always looking for new ways to <strong>create, experiment, and tell stories through visuals.</strong></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-links">
+                <a href="index.html">HOME</a>
+                <a href="projects.html">WORK</a>
+                <a href="about.html">ABOUT</a>
+                <a href="contact.html">GET IN TOUCH</a>
+            </div>
+            <div class="footer-address">
+                <p>MUMBAI, INDIA</p>
+                <p><a href="tel:+917376190518">+91 7376190518</a><br><a href="mailto:Riteshgupta0060@gmail.com">Riteshgupta0060@gmail.com</a></p>
+            </div>
+        </footer>
+
+    </div>
+
+</body>
+</html>
